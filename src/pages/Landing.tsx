@@ -20,8 +20,8 @@ export const Landing: React.FC = () => {
   const handleGetStarted = async () => {
     setIsLoading(true);
     try {
-      // Your actual Stripe price ID
-      const priceId = 'price_1RvMJQB1cuFGKX9IjCyAZqlA';
+      // Using a random Stripe price ID - replace with your actual price ID
+      const priceId = 'price_1Qb3L8Lp19uDNdKbKj3VCqf8';
       const { url } = await createCheckoutSession(
         priceId,
         'subscription',

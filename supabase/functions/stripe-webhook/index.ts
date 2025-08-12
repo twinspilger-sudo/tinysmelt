@@ -69,12 +69,6 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
   const customerId = session.customer as string;
   const customerEmail = session.customer_details?.email;
 
-  // Only proceed if payment was successful
-  if (session.payment_status !== 'paid') {
-    console.log(`Checkout session not paid: ${session.id}, status: ${session.payment_status}`);
-    return;
-  }
-
   if (!customerId || !customerEmail) {
     console.error('Missing customer information in checkout session');
     return;

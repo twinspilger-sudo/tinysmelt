@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
-import { signIn, signUp } from '../lib/supabase';
+import { Link } from 'react-router-dom';
+import { signIn, signUp, signOut } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useSubscription } from '../hooks/useSubscription';
-import { LogIn, UserPlus, AlertCircle, Crown } from 'lucide-react';
+import { LogIn, UserPlus, AlertCircle, Crown, Home, LogOut, ArrowRight } from 'lucide-react';
 
 export const Login: React.FC = () => {
   const { user, loading } = useAuth();
@@ -18,34 +18,6 @@ export const Login: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
-      </div>
-    );
-  }
-
-  if (user && isActive) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  if (user && !isActive) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-8 text-center">
-          <div className="mb-6">
-            <Crown className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Subscription Required
-            </h2>
-            <p className="text-gray-600">
-              You need an active subscription to access the dashboard.
-            </p>
-          </div>
-          <Link
-            to="/"
-            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 shadow-lg inline-block"
-          >
-            Subscribe Now
-          </Link>
-        </div>
       </div>
     );
   }
@@ -70,6 +42,99 @@ export const Login: React.FC = () => {
     }
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
+  // If user is authenticated, show account status
+  if (user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-cyan-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <div className="sm:mx-auto sm:w-full sm:max-w-md">
+          <div className="flex items-center justify-center mb-6">
+            <Crown className="h-12 w-12 text-purple-600 mr-3" />
+            <h1 className="text-3xl font-bold text-gray-900">SaasFlow</h1>
+          </div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Account Status
+          </h2>
+        </div>
+
+        <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+          <div className="bg-white py-8 px-4 shadow-xl sm:rounded-lg sm:px-10">
+            <div className="text-center mb-6">
+              <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
+                isActive ? 'bg-green-100' : 'bg-yellow-100'
+              }`}>
+                <Crown className={`h-8 w-8 ${isActive ? 'text-green-600' : 'text-yellow-600'}`} />
+              </div>
+              
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                {isActive ? 'Premium Member' : 'Account Created'}
+              </h3>
+              
+              <p className="text-gray-600 mb-4">
+                Signed in as: <span className="font-medium">{user.email}</span>
+              </p>
+              
+              {isActive ? (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                  <p className="text-green-800 text-sm">
+                    ✅ You have an active subscription and full access to all premium features.
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                  <p className="text-yellow-800 text-sm">
+                    ⚠️ You need an active subscription to access premium features.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-4">
+              {isActive ? (
+                <Link
+                  to="/dashboard"
+                  className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all transform hover:scale-105"
+                >
+                  <Home className="mr-2 h-4 w-4" />
+                  Go to Dashboard
+                </Link>
+              ) : (
+                <Link
+                  to="/"
+                  className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all transform hover:scale-105"
+                >
+                  <Crown className="mr-2 h-4 w-4" />
+                  Subscribe Now
+                </Link>
+              )}
+              
+              <button
+                onClick={handleSignOut}
+                className="w-full flex justify-center items-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Sign Out
+              </button>
+            </div>
+
+            <div className="mt-6 text-center">
+              <Link
+                to="/"
+                className="text-sm text-purple-600 hover:text-purple-500 transition-colors"
+              >
+                ← Back to homepage
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // If user is not authenticated, show login/signup form
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-cyan-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -141,7 +206,7 @@ export const Login: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105"
+                className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105"
               >
                 {isLoading ? (
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
