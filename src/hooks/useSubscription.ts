@@ -21,25 +21,30 @@ export const useSubscription = () => {
 
   useEffect(() => {
     if (!user) {
+      console.log("useSubscription: No user found, setting subscription to null and loading to false.");
       setSubscription(null);
       setLoading(false);
       return;
     }
 
     const fetchSubscription = async () => {
+      setLoading(true); // Ensure loading is true during fetch
       try {
+        console.log("useSubscription: Attempting to fetch subscription for user ID:", user.id);
         const { data, error } = await supabase
           .from('stripe_user_subscriptions')
           .select('*')
           .maybeSingle();
 
         if (error) {
-          console.error('Error fetching subscription:', error);
+          console.error('useSubscription: Error fetching subscription data from Supabase:', error);
+        } else {
+          console.log('useSubscription: Raw data fetched from Supabase:', data);
         }
 
         setSubscription(data || null);
       } catch (error) {
-        console.error('Error fetching subscription:', error);
+        console.error('useSubscription: Unexpected error during subscription fetch:', error);
         setSubscription(null);
       } finally {
         setLoading(false);
@@ -52,6 +57,9 @@ export const useSubscription = () => {
   const isActive = subscription?.subscription_status === 'active' && 
     subscription.current_period_end && 
     new Date(subscription.current_period_end * 1000) > new Date();
+
+  console.log('useSubscription: Current subscription object state:', subscription);
+  console.log('useSubscription: Calculated isActive status:', isActive);
 
   const currentProduct = subscription?.price_id ? { name: 'Premium Plan', priceId: subscription.price_id } : null;
 
